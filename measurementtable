@@ -66,6 +66,10 @@ meas4<-data.frame(meas3,measaft)
 
 meastable<-meas4[!duplicated(meas4$meas3),]
 
+meastable$measaft<-as.character(meastable$measaft)
+meastable[12,2]="miles per hour"
+
+
 write.csv(meastable,file="meastable.csv",row.names=FALSE)
 
 
