@@ -1,0 +1,71 @@
+#!/bin/Rscript
+
+## goal is to get meastable, a table mapping measurement units to a text representation.
+
+trn<-read.csv("../input/en_train.csv")
+trn$before<-as.character(trn$before)
+trn$after<-as.character(trn$after)
+
+meas3<-gsub("\\,","",gsub("\\.","",gsub("[0-9]","",trn$before[trn$class=="MEASURE"])))
+
+###########
+measafter<-trn$after[trn$class=="MEASURE"]
+n<-length(measafter)
+
+measaft<-rep(0,n)
+
+i=1
+
+###########
+ones<-c("one","two","three","four","five","six","seven","eight","nine")
+
+ones.or<-c("first","second","third","fourth","fifth","sixth","seventh","eighth","ninth")
+## exception for teens
+tens.or<-c("twentieth","thirtieth","fortieth","fiftieth","sixtieth","seventieth","eightieth","ninetieth")
+##
+teens.or<-c("tenth","eleventh","twelfth","thirteenth","fourteenth","fifteenth","sixteenth","seventeenth","eighteenth","nineteenth")
+##
+hundreds.or<-c("one hundredth","two hundredth","three hundredth","four hundredth","five hundredth","six hundredth","seven hundredth","eight hundredth","nine hundredth")
+##
+thousands.or<-c("thousandth","millionth","billionth","trillionth","quadrillionth","quintillionth")
+ones.ths<-c("firsts","seconds","thirds","fourths","fifths","sixths","sevenths","eighths","ninths")
+## exception for teens
+tens<-c("twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety")
+tens.ths<-c("twentieths","thirtieths","fortieths","fiftieths","sixtieths","seventieths","eightieths","ninetieths")
+##
+teens<-c("ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eightteen","nineteen")
+teens.ths<-c("tenths","elevenths","twelfths","thirteenths","fourteenths","fifteenths","sixteenths","seventeenths","eighteenths","nineteenths")
+##
+hundreds<-c("one hundred","two hundred","three hundred","four hundred","five hundred","six hundred","seven hundred","eight hundred","nine hundred")
+hundreds.ths<-c("one hundredths","two hundredths","three hundredths","four hundredths","five hundredths","six hundredths","seven hundredths","eight hundredths","nine hundredths")
+##
+thousands<-c("thousand","million","billion","trillion","quadrillion","quintillion")
+thousands.ths<-c("thousandths","millionths","billionths","trillionths","quadrillionths","quintillionths")
+
+NUMBS<-c("\\so\\s","zero","point",tens,tens.or,tens.ths,teens,teens.or,teens.ths,"hundred","thousand","million","billion","trillion","quadrillion",ones,ones.or,ones.ths,hundreds,hundreds.or,hundreds.ths,thousands,thousands.or,thousands.ths)
+
+########
+
+m<-length(NUMBS)
+
+
+while(i<=n){
+    measaft[i]<-measafter[i]
+    j=1
+
+        while(j<=m){
+            measaft[i]<-gsub(NUMBS[j],"",measaft[i])
+        j=j+1
+        }    
+measaft[i]<-gsub("\\s+"," ",measaft[i])
+print(i)
+i=i+1
+}
+
+meas4<-data.frame(meas3,measaft)
+
+meastable<-meas4[!duplicated(meas4$meas3),]
+
+write.csv(meastable,file="meastable.csv",row.names=FALSE)
+
+
